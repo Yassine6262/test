@@ -1,3 +1,4 @@
+
 <html>
 <head>
 <link rel="stylesheet" href="style.css">
@@ -16,23 +17,21 @@
             <th>Alcohol</th>
         </tr>
         <?php
-        $conn = mysqli_connect("localhost", "root", "", "bieren");
-        if (!$conn) {
-            die("Connection failed: " . mysqli_connect_error());
-        }
-        $sql = "SELECT * FROM bier";
-        $result = mysqli_query($conn, $sql);
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
+        try {
+            $conn = new PDO("mysql:host=localhost;dbname=bieren", "root", "");
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $conn->prepare("SELECT * FROM bier"); 
+            $stmt->execute();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<tr>";
                 echo "<td>" . $row["naam"] . "</td>";
                 echo "<td>" . $row["alcohol"] . "</td>";
                 echo "</tr>";
             }
-        } else {
-            echo "<tr><td colspan='3'>0 results</td></tr>";
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
         }
-        mysqli_close($conn);
+        $conn = null;
         ?>
     </table>
 </body>
